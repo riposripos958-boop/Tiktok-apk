@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Downloader Lite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-white min-h-screen flex items-center justify-center p-6">
+
+    <div class="max-w-md w-full bg-slate-800 p-8 rounded-2xl shadow-2xl border border-slate-700">
+        <h1 class="text-2xl font-bold text-center mb-6 text-pink-500">TikTok Downloader</h1>
+        
+        <div class="space-y-4">
+            <input type="text" id="urlInput" placeholder="Tempel link TikTok di sini..." 
+                class="w-full p-3 rounded-lg bg-slate-700 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-pink-500 transition-all text-sm">
+            
+            <button onclick="downloadVideo()" id="btnDownload"
+                class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-lg transition-colors">
+                Ambil Video
+            </button>
+        </div>
+
+        <div id="result" class="mt-8 hidden space-y-4">
+            <img id="thumb" class="w-full rounded-lg shadow-lg border border-slate-600" src="" alt="Thumbnail">
+            <p id="title" class="text-sm text-slate-300 text-center italic"></p>
+            <a id="downloadBtn" href="" target="_blank"
+                class="block w-full text-center bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition-colors">
+                Download Tanpa Watermark
+            </a>
+        </div>
+
+        <div id="loader" class="mt-4 hidden text-center animate-pulse text-slate-400">
+            Sedang memproses...
+        </div>
+    </div>
+
+    <script>
+        async function downloadVideo() {
+            const url = document.getElementById('urlInput').value;
+            const btn = document.getElementById('btnDownload');
+            const resultDiv = document.getElementById('result');
+            const loader = document.getElementById('loader');
+
+            if (!url) return alert('Masukkan URL dulu, ya!');
+
+            // Reset UI
+            resultDiv.classList.add('hidden');
+            loader.classList.remove('hidden');
+            btn.disabled = true;
+
+            try {
+                // Menggunakan API TikWM (Public API)
+                const response = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`);
+                const data = await response.json();
+
+                if (data.code === 0) {
+                    document.getElementById('thumb').src = 'https://www.tikwm.com' + data.data.cover;
+                    document.getElementById('title').innerText = data.data.title;
+                    document.getElementById('downloadBtn').href = 'https://www.tikwm.com' + data.data.play;
+                    
+                    resultDiv.classList.remove('hidden');
+                } else {
+                    alert('Gagal mengambil video. Pastikan link benar.');
+                }
+            } catch (error) {
+                alert('Terjadi kesalahan koneksi.');
+            } finally {
+                loader.classList.add('hidden');
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
